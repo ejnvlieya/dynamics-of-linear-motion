@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamics of Linear Motion Hub</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
+html{scroll-behavior:smooth}
+body{
+background:linear-gradient(135deg,#020617,#020024,#1e1b4b);
+color:#fff
+}
+
+/* ===== LIGHT MODE ===== */
+body.light{
+background:#f8fafc;
+color:#020617;
+}
+body.light .card,
+body.light .login-box{
+background:#ffffff;
+color:#020617;
+}
+body.light header p{color:#475569}
+
+/* ===== LOGIN ===== */
+#loginOverlay{
+position:fixed;inset:0;
+background:linear-gradient(135deg,#020617,#020024,#1e1b4b);
+display:flex;align-items:center;justify-content:center;
+z-index:9999;
+animation:fadeIn .6s ease;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.login-box{
+background:rgba(255,255,255,.08);
+padding:40px;border-radius:22px;
+width:90%;max-width:420px;text-align:center;
+animation:slideUp .7s cubic-bezier(.4,.2,.2,1);
+}
+@keyframes slideUp{
+from{transform:translateY(40px) scale(.96);opacity:0}
+to{transform:translateY(0) scale(1);opacity:1}
+}
+
+.login-tabs{display:flex;margin-bottom:25px;border-radius:14px;overflow:hidden;background:#1e293b}
+.login-tabs button{
+flex:1;padding:12px;border:none;background:transparent;
+color:#fff;cursor:pointer;transition:.3s
+}
+.login-tabs button.active{background:#6366f1}
+
+.login-box input{
+width:100%;padding:14px;border-radius:14px;
+border:none;margin-bottom:15px;font-size:1rem
+}
+
+.login-box button.main{
+width:100%;padding:14px;border-radius:14px;
+border:none;background:linear-gradient(135deg,#6366f1,#818cf8);
+color:#fff;font-size:1rem;cursor:pointer
+}
+
+.error{color:#f87171;margin-top:10px}
+
+/* ===== HERO ===== */
+header{
+min-height:100vh;
+display:flex;flex-direction:column;
+justify-content:center;align-items:center;
+text-align:center;padding:40px
+}
+header h1{font-size:3.5rem;margin-bottom:20px}
+header p{max-width:700px;color:#c7d2fe;margin-bottom:40px}
+
+.btn{
+padding:14px 28px;border-radius:14px;border:none;
+background:linear-gradient(135deg,#6366f1,#818cf8);
+color:#fff;cursor:pointer;transition:.2s
+}
+.btn:hover{transform:translateY(-3px)}
+
+.small-btn{
+padding:8px 16px;border-radius:10px;border:none;
+background:#22c55e;color:#000;cursor:pointer;font-size:.85rem
+}
+
+.btn-group{display:flex;gap:16px;flex-wrap:wrap}
+
+/* ===== SECTIONS ===== */
+section{padding:80px 10%}
+section h2{font-size:2.2rem;margin-bottom:40px}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:24px
+}
+
+.card{
+background:rgba(255,255,255,.08);
+border-radius:20px;
+padding:24px;transition:.2s
+}
+.card:hover{transform:translateY(-5px)}
+
+.view-btn{
+margin-top:14px;padding:10px 18px;border-radius:10px;
+border:none;background:#4f46e5;color:white;cursor:pointer
+}
+
+/* ===== PDF ===== */
+.pdf-box{
+  margin-top:15px;
+  max-height:0;
+  overflow:hidden;
+  border-radius:14px;
+  transition:max-height .4s ease;
+}
+
+.pdf-box iframe{
+  width:100%;
+  height:500px;
+  border:none;
+  touch-action: manipulation;
+}
+/* ===== FLASHCARDS ===== */
+.flashcard-wrapper{perspective:1200px}
+.flashcard{
+background:#111827;border-radius:18px;
+min-height:170px;cursor:pointer;
+position:relative;transform-style:preserve-3d;
+transition:transform .7s cubic-bezier(.4,.2,.2,1)
+}
+.flashcard:hover{transform:scale(1.04)}
+.flashcard.flipped{transform:rotateY(180deg) scale(1.05)}
+
+.flash-inner{
+position:absolute;inset:0;
+display:flex;align-items:center;justify-content:center;
+padding:30px;backface-visibility:hidden;border-radius:18px
+}
+.flash-front{background:#111827}
+.flash-back{background:#4f46e5;transform:rotateY(180deg)}
+.flash-inner p{font-size:1.1rem;color:#e0e7ff;text-align:center}
+
+.flashcard-wrapper.collapsed .flashcard:nth-child(n+4){display:none}
+
+/* ===== LIGHT MODE FIX: FLASHCARDS ===== */
+body.light .flashcard{
+  background:#ffffff;
+}
+body.light .flash-front{
+  background:#ffffff;
+}
+body.light .flash-front p{
+  color:#020617;
+}
+body.light .flash-back{
+  background:#6366f1;
+}
+body.light .flash-back p{
+  color:white;
+}
+
+/* ===== PAST YEAR ===== */
+.pastyear-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+gap:30px
+}
+.pastyear-card{
+background:linear-gradient(135deg,#1e1b4b,#312e81);
+border-radius:28px;padding:36px 40px;
+display:flex;justify-content:space-between;align-items:center;
+box-shadow:0 20px 60px rgba(0,0,0,.35);
+transition:.3s
+}
+.pastyear-card:hover{
+transform:translateY(-6px);
+box-shadow:0 30px 80px rgba(0,0,0,.45)
+}
+.drive-btn{
+padding:14px 26px;border-radius:16px;
+border:none;font-size:1rem;cursor:pointer;color:white;
+background:linear-gradient(135deg,#6366f1,#818cf8)
+}
+
+/* ===== TIMER ===== */
+.timer{font-size:2rem;margin:20px 0}
+
+/* ===== FLOATING BUTTONS ===== */
+#modeToggle{
+position:fixed;top:20px;right:20px;
+padding:10px 16px;border-radius:12px;
+border:none;background:#6366f1;color:white;
+cursor:pointer;z-index:999
+}
+#topBtn{
+position:fixed;bottom:30px;right:30px;
+padding:14px;border-radius:50%;
+border:none;background:#22c55e;
+font-size:18px;cursor:pointer;
+display:none;z-index:999
+}
+
+footer{text-align:center;padding:30px;color:#a5b4fc;background:rgba(0,0,0,.3)}
+
+/* ===== LIGHT MODE FIX: PAST YEAR ===== */
+body.light .pastyear-card{
+  background:linear-gradient(135deg,#e0e7ff,#c7d2fe);
+  color:#020617;
+}
+body.light .pastyear-card h3{
+  color:#020617;
+}
+
+/* ===== MCQ STYLING ===== */
+.mcq-card{margin-bottom:28px}
+.mcq-card h3{margin-bottom:14px}
+
+.option{
+padding:12px 16px;
+border-radius:12px;
+margin-bottom:10px;
+cursor:pointer;
+background:rgba(255,255,255,.08);
+transition:.2s
+}
+.option:hover{transform:scale(1.02)}
+.option.correct{background:#22c55e;color:#000}
+.option.wrong{background:#ef4444;color:#fff}
+.option.disabled{pointer-events:none;opacity:.7}
+
+body.light .option{
+background:#f1f5f9;
+color:#020617
+}
+
+/* ===== LIGHT MODE MCQ FIX ===== */
+body.light .option.correct{
+  background:#22c55e !important;
+  color:#000 !important;
+}
+
+body.light .option.wrong{
+  background:#ef4444 !important;
+  color:#fff !important;
+}
+
+.open-pdf-btn{
+  margin-top:12px;
+  padding:10px 18px;
+  border-radius:12px;
+  border:none;
+  background:#22c55e;
+  color:#000;
+  cursor:pointer;
+  font-size:.9rem;
+}
+
+.whatsapp-btn{
+  margin-top:16px;
+  padding:14px 28px;
+  border-radius:16px;
+  border:none;
+  background:#25D366;
+  color:#000;
+  font-size:1rem;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.whatsapp-btn:hover{
+  transform:scale(1.05);
+}
+
+/* ===== LIGHT MODE FIX: WHATSAPP SUBTEXT + FOOTER ===== */
+body.light .whatsapp-subtext{
+  color:#020617 !important;
+}
+
+body.light footer{
+  color:#020617 !important;
+}
+
+</style>
+</head>
+
+<body>
+
+<button id="modeToggle">🌙 / ☀️</button>
+<button id="topBtn">⬆️</button>
+
+<!-- LOGIN -->
+<div id="loginOverlay">
+<div class="login-box">
+<h2>⚛️ Dynamics of Linear Motion Hub</h2>
+<div class="login-tabs">
+<button id="loginTab" class="active" onclick="showLogin()">Login</button>
+<button id="signupTab" onclick="showSignup()">Sign Up</button>
+</div>
+<input id="username" placeholder="Username">
+<button class="main" onclick="handleAuth()">Continue</button>
+<div class="error" id="error"></div>
+</div>
+</div>
+
+<!-- HERO -->
+<header>
+<h1 id="welcomeText">Dynamics of Linear Motion Hub</h1>
+<p>Master Physics with notes, flashcards, MCQs & past year questions.</p>
+<div class="btn-group">
+<button class="btn" onclick="location.href='#notes'">📘 Notes</button>
+<button class="btn" onclick="location.href='#formula'">📐Formula Sheet</button>
+<button class="btn" onclick="location.href='#mcq'">✅ MCQs</button>
+<button class="btn" onclick="location.href='#pastyear'">📄 Past Year</button>
+<button class="btn" onclick="location.href='#more'">✨ Study Timer</button>
+<button class="btn" onclick="location.href='#group'">Whatsapp Group Chat</button>
+</div>
+<br>
+<button class="small-btn" onclick="logout()">Logout</button>
+</header>
+
+<!-- NOTES -->
+<section id="notes">
+<h2>📘 Notes</h2>
+<div class="grid">
+<div class="card">
+  <h3>3.1 Momentum & Impulse</h3>
+
+  <button class="small-btn" onclick="togglePDF('pdf31')">Preview</button>
+  <a href="3.1.pdf" target="_blank">
+    <button class="open-pdf-btn">Open Full PDF 🔍</button>
+  </a>
+
+  <div class="pdf-box" id="pdf31">
+    <iframe src="3.1.pdf#toolbar=1&zoom=page-width"></iframe>
+  </div> </div>
+<div class="card">
+  <h3>3.2 Conservation of Linear Momentum</h3>
+
+  <button class="small-btn" onclick="togglePDF('pdf32')">Preview</button>
+  <a href="3.2.pdf" target="_blank">
+    <button class="open-pdf-btn">Open Full PDF 🔍</button>
+  </a>
+
+  <div class="pdf-box" id="pdf32">
+    <iframe src="3.2.pdf#toolbar=1&zoom=page-width"></iframe>
+  </div></div>
+<div class="card">
+  <h3>3.3 Forces & FBD</h3>
+
+  <button class="small-btn" onclick="togglePDF('pdf33')">Preview</button>
+  <a href="3.3.pdf" target="_blank">
+    <button class="open-pdf-btn">Open Full PDF 🔍</button>
+  </a>
+
+  <div class="pdf-box" id="pdf33">
+    <iframe src="3.3.pdf#toolbar=1&zoom=page-width"></iframe>
+  </div></div>
+<div class="card">
+  <h3>3.4 Newton's Laws</h3>
+
+  <button class="small-btn" onclick="togglePDF('pdf34')">Preview</button>
+  <a href="3.4.pdf" target="_blank">
+    <button class="open-pdf-btn">Open Full PDF 🔍</button>
+  </a>
+
+  <div class="pdf-box" id="pdf34">
+    <iframe src="3.4.pdf#toolbar=1&zoom=page-width"></iframe>
+  </div></div>
+</div>
+
+<h3 style="margin-top:60px">🧠 Flashcards</h3>
+<button class="small-btn" onclick="toggleFlashcards(event)">👀 See more</button>
+
+<div class="grid flashcard-wrapper collapsed" id="flashcards" style="margin-top:20px">
+<div class="flashcard" onclick="flip(this)">
+<div class="flash-inner flash-front"><p>What is momentum?</p></div>
+<div class="flash-inner flash-back"><p>Momentum is the product of mass and velocity (p=mv)</p></div>
+</div>
+<div class="flashcard" onclick="flip(this)">
+<div class="flash-inner flash-front"><p>State Newton’s Second Law of Motion</p></div>
+<div class="flash-inner flash-back"><p>The rate of change of momentum of a body is proportional to the applied force and occurs in the direction of the force (F=ma)</p></div>
+</div>
+<div class="flashcard" onclick="flip(this)">
+<div class="flash-inner flash-front"><p>What is impulse?</p></div>
+<div class="flash-inner flash-back"><p>Impulse is the product of force and time, equal to the change in momentum (J=FΔt=Δp=mv-mu)</p></div>
+</div>
+<div class="flashcard" onclick="flip(this)">
+<div class="flash-inner flash-front"><p>State the Principle of Conservation of Linear Momentum</p></div>
+<div class="flash-inner flash-back"><p>In an isolated system with no external forces, the total linear momentum remains constant</p></div>
+</div>
+<div class="flashcard" onclick="flip(this)">
+<div class="flash-inner flash-front"><p>What is the SI unit of impulse?</p></div>
+<div class="flash-inner flash-back"><p>Newton second (N s), equivalent to kg m s⁻¹</p></div>
+</div>
+
+</div>
+</section>
+
+<!-- FORMULA -->
+<section id="formula">
+<h2>📐 Formula Sheet</h2>
+<div class="grid">
+<div class="card"><h3>Formula</h3><img src="formula.jpeg" style="width:40%;border-radius:8px"></div>
+</div>
+</section>
+
+<!-- MCQ -->
+<section id="mcq">
+<h2>✅ MCQ Practice</h2>
+
+<div class="card" style="max-width:900px;margin:auto">
+
+<div class="mcq-card" data-answer="1">
+<h3>1. The SI unit of momentum is</h3>
+<div class="option">kg m s⁻²</div>
+<div class="option">kg m s⁻¹</div>
+<div class="option">N s⁻¹</div>
+<div class="option">kg s⁻¹</div>
+</div>
+
+<div class="mcq-card" data-answer="1">
+<h3>2. A force of 10 N acts on a body of mass 2 kg.
+What is the acceleration of the body?</h3>
+<div class="option">2 m s⁻²</div>
+<div class="option">5 m s⁻²</div>
+<div class="option">10 m s⁻²</div>
+<div class="option">20 m s⁻²</div>
+</div>
+
+<div class="mcq-card" data-answer="2">
+<h3>3. Which quantity is equal to the area under a force–time graph?</h3>
+<div class="option">Force</div>
+<div class="option">Acceleration</div>
+<div class="option">Impulse</div>
+<div class="option">Momentum</div>
+</div>
+
+<div class="mcq-card" data-answer="3">
+<h3>4. In an isolated system, the total linear momentum remains constant.
+This statement refers to</h3>
+<div class="option">Newton’s First Law</div>
+<div class="option">Newton’s Second Law</div>
+<div class="option">Law of Conservation of Energy</div>
+<div class="option">Principle of Conservation of Linear Momentum</div>
+</div>
+
+<div id="mcqScore" style="margin-top:25px;font-size:1.2rem;font-weight:600">
+Score: 0 / 4
+</div>
+
+</div>
+</section>
+
+<!-- PAST YEAR -->
+<section id="pastyear">
+<h2>📄 Past Year Questions</h2>
+<div class="pastyear-grid">
+<div class="pastyear-card"><h3>PRE-PSPM</h3><button class="drive-btn" onclick="openDrive('https://drive.google.com/drive/folders/1q9JRfVgj5lJbws7VIXokZQiawinkUkxY')">Open</button></div>
+<div class="pastyear-card"><h3>PSPM</h3><button class="drive-btn" onclick="openDrive('https://drive.google.com/drive/folders/1kpJ27fza8ntbLgj_Afn7vdAzktG6dbFp')">Open</button></div>
+</div>
+</section>
+
+<!-- TIMER -->
+<section id="more">
+<h2>✨ Study Tools</h2>
+<div class="card">
+<h3>⏱️ Study Timer</h3>
+<div class="timer" id="timer">00:00</div>
+<button class="small-btn" onclick="startTimer()">Start</button>
+<button class="small-btn" onclick="stopTimer()">Stop</button>
+<button class="small-btn" onclick="resetTimer()">Reset</button>
+</div>
+</section>
+
+<!-- WHATSAPP GROUP -->
+<section id="group">
+  <h2>📱 Join Our WhatsApp Study Group</h2>
+
+  <div class="grid">
+    <div class="card" style="text-align:center">
+      <h3>Physics Discussion & Updates</h3>
+      <p style="margin:20px 0;color:#c7d2fe" class="whatsapp-subtext">
+        Ask questions, share tips, and study together with friends 👩‍🔬👨‍🔬
+      </p>
+
+      <button class="whatsapp-btn"
+        onclick="window.open('https://chat.whatsapp.com/DDQuBFbnB6OL04kjzxhzDH','_blank')">
+        Join WhatsApp Group 💬
+      </button>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Alieya_Zahirah Physics Hub ⚛️</footer>
+
+<script>
+let mode="login";
+function showLogin(){mode="login";loginTab.classList.add("active");signupTab.classList.remove("active")}
+function showSignup(){mode="signup";signupTab.classList.add("active");loginTab.classList.remove("active")}
+function handleAuth(){
+const name=username.value.trim();
+if(!name){error.textContent="Enter username";return}
+let users=JSON.parse(localStorage.getItem("users")||"[]");
+if(mode==="signup"&&!users.includes(name)){users.push(name);localStorage.setItem("users",JSON.stringify(users))}
+if(mode==="login"&&!users.includes(name)){error.textContent="User not found";return}
+localStorage.setItem("currentUser",name);
+loginOverlay.style.display="none";
+welcomeText.textContent=`Welcome, ${name} 👋`;
+}
+window.onload=()=>{
+const u=localStorage.getItem("currentUser");
+if(u){loginOverlay.style.display="none";welcomeText.textContent=`Welcome, ${u} 👋`}
+if(localStorage.getItem("mode")==="light"){document.body.classList.add("light")}
+}
+function logout(){localStorage.removeItem("currentUser");location.reload();}
+function togglePDF(id){
+  const box = document.getElementById(id);
+  if(box.style.maxHeight){
+    box.style.maxHeight = null;
+  }else{
+    box.style.maxHeight = "520px";
+  }
+}
+
+function flip(card){card.classList.toggle("flipped")}
+function toggleFlashcards(e){
+flashcards.classList.toggle("collapsed");
+e.target.textContent=flashcards.classList.contains("collapsed")?"👀 See more":"🔼 Show less";
+}
+function openDrive(link){window.open(link,"_blank")}
+let time=0,interval;
+function startTimer(){
+if(interval)return;
+interval=setInterval(()=>{
+time++;
+timer.textContent=`${String(Math.floor(time/60)).padStart(2,"0")}:${String(time%60).padStart(2,"0")}`
+},1000)
+}
+function stopTimer(){clearInterval(interval);interval=null}
+function resetTimer(){stopTimer();time=0;timer.textContent="00:00"}
+
+modeToggle.onclick=()=>{
+document.body.classList.toggle("light");
+localStorage.setItem("mode",document.body.classList.contains("light")?"light":"dark");
+}
+
+window.addEventListener("scroll",()=>{
+topBtn.style.display=window.scrollY>300?"block":"none";
+});
+topBtn.onclick=()=>window.scrollTo({top:0,behavior:"smooth"});
+
+/* ===== MCQ LOGIC ===== */
+let mcqScore = 0;
+const mcqCards = document.querySelectorAll(".mcq-card");
+const mcqTotal = mcqCards.length;
+
+mcqCards.forEach(card=>{
+  const correct = Number(card.dataset.answer);
+  const options = card.querySelectorAll(".option");
+
+  options.forEach((opt,i)=>{
+    opt.onclick = ()=>{
+      if(card.classList.contains("done")) return;
+      card.classList.add("done");
+
+      if(i === correct){
+        opt.classList.add("correct");
+        mcqScore++;
+      }else{
+        opt.classList.add("wrong");
+        options[correct].classList.add("correct");
+      }
+
+      options.forEach(o=>o.classList.add("disabled"));
+      document.getElementById("mcqScore").textContent =
+        `Score: ${mcqScore} / ${mcqTotal}`;
+    }
+  });
+});
+</script>
+
+
+</body>
+</html>
